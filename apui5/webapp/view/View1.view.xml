@@ -1,0 +1,42 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" controllerName="sap.btp.apui5.controller.View1">
+    <VBox alignItems="Center">
+       <Label text="Nome" required="true"/> <Input id="Nome" /> 
+        <Label text="Cognome" required="true"> </Label> <Input id="Cognome" required="true" />
+        <Label text="Sesso" required="true"/> <Select id="Sesso">
+            <core:Item key="Maschio" text="Maschio" />
+            <core:Item key="Femmina" text="Femmina" />
+            <core:Item key="Altro" text="Altro" />
+        </Select>
+        <Label text="CF"/> <Input id="CF" maxLength="16" />
+        <Label text="Telefono"/> <Input id="Telefono" type="Number"/>
+        <Button text="Rivedi dati" press="onPress" />
+    </VBox>
+
+    <!--sotto sto facendo una tabella-->
+
+     <Page>
+    <content>
+      <Button text="Avanti Tabella" press="navigate" />
+      <SearchField id="barraRicerca" search="onSearch" width="100%"/> 
+      <Table id="tabellaProva" items="{modelloUno>/}">
+        <columns>
+          <Column>
+            <Text text="Parametro" />
+          </Column>
+          <Column>
+            <Text text="Valore" />
+          </Column>
+        </columns>
+        <items> <!--aggregazione item-->
+          <ColumnListItem>
+            <cells>
+              <Label text="{modelloUno>Parametro}" />
+              <Input value="{modelloUno>Valore}" />
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </content>
+  </Page>
+
+</mvc:View>

@@ -1,0 +1,5 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="sap.btp.apui5.controller.View2">
+    <VBox>
+        
+    </VBox>
+</mvc:View>

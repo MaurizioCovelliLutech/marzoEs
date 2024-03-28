@@ -1,0 +1,7 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" controllerName="sap.btp.apui5.controller.View3">
+
+ <VBox>
+    <Label text="{tabellaNuovaView>/1/Valore}"/>  
+</VBox>
+
+</mvc:View>
