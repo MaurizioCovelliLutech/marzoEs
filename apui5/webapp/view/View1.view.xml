@@ -45,14 +45,19 @@
 									<Input valueStateText="nome>>"
 											valueState="{/firstNameState}" 
 											id="FirstName"
-											placeholder="inserisci nome" 
+											placeholder="inserisci nome"
+											showSuggestion="true"
+											autocomplete="true"
 											value="{/firstName}"
 											valueHelpRequest="onValueHelpRequested"
 											showValueHelp="true"/>
 											
-											<Text text="ciao" />
-                        			<Text text="{modEmployee>/hireDate}" />
-                       				<Text text="{modEmployee>/title}" />
+											<Label text="Nome " />
+                       						<Text text="{modSelectedEmployee>/FirstName}" />
+											<Label text="Cognome " />
+                       						<Text text="{modSelectedEmployee>/LastName}"/>
+											<Label text="Data " />
+                        					<Text text="{modSelectedEmployee>/HireDate}" />
 									
 									
 								</form:SimpleForm>
@@ -82,7 +87,7 @@
                     					<ColumnListItem>
                       						<cells>
                            						<ObjectIdentifier title="{ProductName}" />
-                            					<Text text="{=parseFloat(${UnitPrice})}" />
+                            					<Text text="{=parseFloat(${UnitPrice}.toFixed(2))}" />
                            						<Text text="{UnitsInStock}" />
                            						<StepInput value="{Quantity}" min="0" max="{UnitsInStock}" change=".calculateTotalPrice" />
                            						<Text text="{TotalPrice}" />
@@ -97,21 +102,41 @@
 										complete="pricingComplete"
 										validated="true"
 										title="Pricing">
-								<MessageStrip class="sapUiSmallMarginBottom"
-										text="You can use the wizard previousStep() and nextStep() methods to navigate from step to step without validation. Also you can use the GoToStep(step) method to scroll programmatically to previously visited steps."
-										showIcon="true"/>
-								<form:SimpleForm
-										editable="true"
-										layout="ResponsiveGridLayout">
-									<Label text="Price"/>
-									<Input value="{/productPrice}"/>
-									<Label text="Discount group"/>
-									<ComboBox selectedKey="{/discountGroup}">
-										<core:Item key="Kids" text="Kids"/>										
-									</ComboBox>
-									<Label text=" VAT is included"/>
-									<CheckBox selected="{/productVAT}"/>
-								</form:SimpleForm>
+								    <Page title="Step 3">
+        <content>
+            <Table id="customersTable" items="{customersModel>/}">
+                <columns>
+                    <Column>
+                        <Text text="ID Cliente" />
+                    </Column>
+                    <Column>
+                        <Text text="Nome Compagnia" />
+                    </Column>
+                    <Column>
+                        <Text text="Nome Contatto" />
+                    </Column>
+                    <Column>
+                        <Text text="Località" />
+                    </Column>
+                    <Column>
+                        <Text text="Telefono" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem press=".onSelectCustomer">
+                        <cells>
+                            <ObjectIdentifier title="{customersModel>CustomerID}" />
+                            <Text text="{customersModel>CompanyName}" />
+                            <Text text="{customersModel>ContactName}" />
+                            <Text text="{= ${customersModel>City} + ' (' + ${customersModel>Country} + ')' }" />
+                            <Text text="{customersModel>Phone}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+
 							</WizardStep>
 						</Wizard>
 					</content>

@@ -28,21 +28,30 @@ sap.ui.define([
 			this.model.setData({
 				productNameState: "Error",
 				productWeightState: "Error"
-			});
-			this.getView().setModel(this.model);
-			this.model.setProperty("/firstName");
-			this.model.setProperty("/availabilityType");
-			this.model.setProperty("/navApiEnabled", true);
-			this.model.setProperty("/productVAT", false);
-			this.model.setProperty("/measurement", "");
-			// this._setEmptyValue("/productManufacturer");
-			// this._setEmptyValue("/productDescription");
-			// this._setEmptyValue("/size");
-			// this._setEmptyValue("/productPrice");
-			// this._setEmptyValue("/manufacturingDate");
-			// this._setEmptyValue("/discountGroup"); 
 
+			});
 		},
+
+		onRouteMatched: async function(oEvent) {
+
+			var oModel = new ODataModel("/V2/Northwind/Northwind.svc/");
+
+		  
+			const oData = await new Promise((resolve, reject) => {
+				oModel.read("/Products" , {
+					success: function(oData, response) {
+						resolve(oData);
+					  },
+					  error: function(error) {
+						  reject(error);
+					  }
+				  });
+			  });	  
+
+			  this.getView().setModel(new JSONModel(oData.results), "modProducts");
+  
+		},
+
 
 		onSearch: async function (oEvent) {
            // var oTable = this.getView().byId("exportTable");
@@ -207,11 +216,11 @@ sap.ui.define([
 		},
         
         onContinue: function() {
-			var oSelectedEmployee = this.getView().getModel("modEmployee").getProperty("/SelectedEmployee");
-            // if (!oSelectedEmployee || !oSelectedEmployee.EmployeeID) {
-            //     sap.m.MessageToast.show("eh eh devi inserire un impiegato prima di proseguire!");
-            //     return;
-            // }
+			var oSelectedEmployee = this.getView().getModel("modSelectedEmployee");
+            if (!oSelectedEmployee || !oSelectedEmployee.getProperty("/EmployeeID")) {
+                sap.m.MessageToast.show("eh eh devi inserire un impiegato prima di proseguire!");
+                return;
+            }
 
 			this._wizard.nextStep();
 
@@ -267,43 +276,55 @@ sap.ui.define([
 			var oSelectedItem = oTable.getSelectedItem();
 		
 			if (oSelectedItem) {
-				var selectedEmployee = oSelectedItem.getCells()[0].getText();//getbindingcontext
-				this.getView().byId("FirstName").setValue(selectedEmployee);
+				var selectedRigaEmployee = oSelectedItem.getBindingContext("modEmployee").getObject();
+				this.getView().setModel(new JSONModel(selectedRigaEmployee), "modSelectedEmployee");
+				this.getView().byId("FirstName").setValue(selectedRigaEmployee.FirstName);
 			} else {
 				
 			}
+
+
 		
 			this.onValueHelpCancel();
 		},
 
-		prossimoStep: function() { //non va bene perchè non sto navigando tra view ma sto procedento sempre all'interno del wizard
-            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            oRouter.navTo("Step3"); //in questo caso al 3 come prova
-        },
-
+		
 		precedenteStep: function(){
 
 			// this._handleMessageBoxOpen("Sei sicuro sicuro sicuro?");
 			this._wizard.previousStep();
 		},
-
+		
 		calculateTotalPrice: function(event) {
-            var oItem = event.getSource().getParent();
+			
+			var oItem = event.getSource().getParent();
             var prezzoUnita = parseFloat(oItem.getBindingContext().getProperty("UnitPrice"));
             var quantita = parseInt(oItem.getBindingContext().getProperty("Quantity"));
             var prezzoTotale = prezzoUnita * quantita;
-            oItem.getBindingContext().setProperty("TotalPrice", prezzoTotale.toFixed(2));
+            oItem.getBindingContext("modProducts").setProperty("TotalPrice", prezzoTotale.toFixed(2));
+			
         },
-		
-		
 		
 	});
 });
 
 //_______________ATTENZIONE______________________DA QUI PARTE LA QUARANTENA COMMENTI______________________ATTENZIONE________________
 
-		/*onValueHelpSelectionChange: function(oEvent) {
-            var selectedEmployee = oEvent.getParameter("ListItem").getCells()[0].getText();
+
+//_______________ATTENZIONE______________________DA QUI PARTE LA QUARANTENA COMMENTI______________________ATTENZIONE________________
+
+
+//_______________ATTENZIONE______________________DA QUI PARTE LA QUARANTENA COMMENTI______________________ATTENZIONE________________
+
+
+// prossimoStep: function() { //non va bene perchè non sto navigando tra view ma sto procedento sempre all'interno del wizard
+//     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+//     oRouter.navTo("Step3"); //in questo caso al 3 come prova
+// },
+
+
+/*onValueHelpSelectionChange: function(oEvent) {
+	var selectedEmployee = oEvent.getParameter("ListItem").getCells()[0].getText();
             this.getView().byId("FirstName").setValue(selectedEmployee);
 
 			this.getView().getSelectedItem()
