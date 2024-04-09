@@ -1,0 +1,39 @@
+<core:FragmentDefinition xmlns:vhd="sap.ui.comp.valuehelpdialog" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:comp="sap.ui.comp.filterbar"
+>
+        <Dialog>
+        <!-- <comp:FilterBar search="onValueHelpSearch"> -->
+        <!-- </comp:FilterBar> -->
+        <Table id="customerTable" growing="true" growingThreshold="100" mode="SingleSelectLeft" items="{modEmployee>/}">
+            <columns>
+                <Column>
+                    <Label text="First Name"/>
+                </Column>
+                <Column>
+                    <Label text="Last Name"/>
+                </Column>
+                <Column>
+                    <Label text="Hire Date"/>
+                </Column>
+                <Column>
+                    <Label text="Title"/>
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Label text="{modEmployee>FirstName}" />
+                        <Label text="{modEmployee>LastName}" />
+                        <Label text="{modEmployee>HireDate}" />
+                        <Label text="{modEmployee>Title}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <footer>
+            <OverflowToolbar>
+                <Button text="applica" press="onValueHelpSelectionChange"/>
+                <Button text="annulla" press="onValueHelpCancel"/>
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

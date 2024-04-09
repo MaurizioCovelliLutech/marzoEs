@@ -1,42 +1,224 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" controllerName="sap.btp.apui5.controller.View1">
-    <VBox alignItems="Center">
-       <Label text="Nome" required="true"/> <Input id="Nome" /> 
-        <Label text="Cognome" required="true"> </Label> <Input id="Cognome" required="true" />
-        <Label text="Sesso" required="true"/> <Select id="Sesso">
-            <core:Item key="Maschio" text="Maschio" />
-            <core:Item key="Femmina" text="Femmina" />
-            <core:Item key="Altro" text="Altro" />
-        </Select>
-        <Label text="CF"/> <Input id="CF" maxLength="16" />
-        <Label text="Telefono"/> <Input id="Telefono" type="Number"/>
-        <Button text="Rivedi dati" press="onPress" />
-    </VBox>
+<mvc:View 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m" 
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified" 
+    controllerName="sap.btp.apui5.controller.View1">
 
-    <!--sotto sto facendo una tabella-->
+    <NavContainer id="wizardNavContainer" >
+			<pages>
+				<Page
+				id="wizardContentPage"
+				showHeader="false">
+					<content>
+						<Wizard id="CreateProductWizard"
+                        showNextButton="false" 
+                        class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
+								complete="wizardCompletedHandler">
+							<!-- <WizardStep id="FirstNameStep"
+										title="Employee"
+										validated="true">
+								
+								<Text class="sapUiSmallMarginBottom"
+                                    text="prova"
+                                        />
+								<HBox
+										alignItems="Center"
+										justifyContent="Center"
+										width="100%">
+								</HBox>
+							</WizardStep> -->
+							<WizardStep id="Impiegato"
+										validated="false"
+										title="Impiegato"
+										activate="additionalInfoValidation">
+								<MessageStrip class="sapUiSmallMarginBottom"
+										text="sono un messaggio blu "
+										showIcon="true"/>
+								<Text text="  Donec pulvinar"/>
+								
+								<form:SimpleForm
+										editable="true"
+										layout="ResponsiveGridLayout">
+									<Label text="Name" required="true"/>
+									<Input valueStateText="nome>>"
+											valueState="{/firstNameState}" 
+											id="FirstName"
+											placeholder="inserisci nome" 
+											value="{/firstName}"
+											valueHelpRequest="onValueHelpRequested"
+											showValueHelp="true"/>
+											
+											<Text text="ciao" />
+                        			<Text text="{modEmployee>/hireDate}" />
+                       				<Text text="{modEmployee>/title}" />
+									
+									
+								</form:SimpleForm>
 
-     <Page>
-    <content>
-      <Button text="Avanti Tabella" press="navigate" />
-      <SearchField id="barraRicerca" search="onSearch" width="100%"/> 
-      <Table id="tabellaProva" items="{modelloUno>/}">
-        <columns>
-          <Column>
-            <Text text="Parametro" />
-          </Column>
-          <Column>
-            <Text text="Valore" />
-          </Column>
-        </columns>
-        <items> <!--aggregazione item-->
-          <ColumnListItem>
-            <cells>
-              <Label text="{modelloUno>Parametro}" />
-              <Input value="{modelloUno>Valore}" />
-            </cells>
-          </ColumnListItem>
-        </items>
-      </Table>
-    </content>
-  </Page>
+							</WizardStep>
+						    <WizardStep title="Prodotti">
+        						<VBox>
+         						   <Table id="productsTable" mode="MultiSelect" items="{/Products}">
+             							<columns>
+                				    		<Column>
+                       							 <Text text="Nome Prodotto" />
+                    						</Column>
+                   							<Column>
+                    						    <Text text="Prezzo unitario" />
+                   							</Column>
+											<Column>
+                       							<Text text="Unità rimaste" />
+                    						</Column>
+                   							<Column>
+                     							<Text text="Quantità" />
+                  							</Column>
+                   							<Column>
+                    						    <Text text="Prezzo totale" />
+                   							</Column>
+               							</columns>
+               						<items>
+                    					<ColumnListItem>
+                      						<cells>
+                           						<ObjectIdentifier title="{ProductName}" />
+                            					<Text text="{=parseFloat(${UnitPrice})}" />
+                           						<Text text="{UnitsInStock}" />
+                           						<StepInput value="{Quantity}" min="0" max="{UnitsInStock}" change=".calculateTotalPrice" />
+                           						<Text text="{TotalPrice}" />
+                       						</cells>
+                    					</ColumnListItem>
+                					</items>
+          						</Table>
+       						</VBox>
+    					</WizardStep>							
+							<WizardStep id="PricingStep"
+										activate="pricingActivate"
+										complete="pricingComplete"
+										validated="true"
+										title="Pricing">
+								<MessageStrip class="sapUiSmallMarginBottom"
+										text="You can use the wizard previousStep() and nextStep() methods to navigate from step to step without validation. Also you can use the GoToStep(step) method to scroll programmatically to previously visited steps."
+										showIcon="true"/>
+								<form:SimpleForm
+										editable="true"
+										layout="ResponsiveGridLayout">
+									<Label text="Price"/>
+									<Input value="{/productPrice}"/>
+									<Label text="Discount group"/>
+									<ComboBox selectedKey="{/discountGroup}">
+										<core:Item key="Kids" text="Kids"/>										
+									</ComboBox>
+									<Label text=" VAT is included"/>
+									<CheckBox selected="{/productVAT}"/>
+								</form:SimpleForm>
+							</WizardStep>
+						</Wizard>
+					</content>
+					<footer>
+						<OverflowToolbar>
+							<ToolbarSpacer/>
+                            <Button text="Continua" press="onContinue"/>
+							<Button text="Cancel" press="precedenteStep"/>
+							<Button text="chiamataEmployee" press="onSearch"/>
+
+						</OverflowToolbar>
+					</footer>
+				</Page>
+				<Page id="wizardReviewPage" showHeader="false" visible="false">
+					<content>
+						<form:SimpleForm
+								title="1. impiegato"
+								editable="false"
+								layout="ResponsiveGridLayout">
+							<form:content>
+								<Label text="Employee"/>
+								<Text id="EmployeeChosen" text="{/Employee}"/>
+								<Link press="editStepOne" text="Edit" />
+							</form:content>
+						</form:SimpleForm>
+
+						<form:SimpleForm
+								title="2. Product Information"
+								editable="false"
+								layout="ResponsiveGridLayout">
+							<form:content>
+								<Label text="Name"/>
+								<Text id="FirstNameChosen" text="{/firstName}"/>
+								<Label text="Last name"/>
+								<Text id="LastNameChosen" text="{/lastName}"/>
+								<Label text="Data assunzione"/>
+								<Text id="HireDareChosen" text="{/hireDate}"/>
+								<Label text="Titolo(?)"/>
+								<Text id="titleChosen" text="{/title}"/>
+								<Link press="editStepTwo" text="Edit" />
+							</form:content>
+						</form:SimpleForm>
+
+						<form:SimpleForm
+								title="3. Optional Information"
+                                editable="false"
+								layout="ResponsiveGridLayout">
+							<form:content>
+								<Label text="Some text"/>
+								<Text text="Lorem ipsum dolor sit "/>
+								<Label text="Manufacturing Date"/>
+								<Text id="ManufacturingDate" text="{/manufacturingDate}"/>
+								<Label text="Availability"/>
+								<Text id="AvailabilityChosen" text="{/availabilityType}"/>
+								<Label text="Size"/>
+								<HBox>
+									<Text id="Size" text="{/size}"/>
+									<Text id="Size2" class="sapUiTinyMarginBegin" text="{/measurement}"/>
+								</HBox>
+								<Link press="editStepThree" text="Edit" />
+							</form:content>
+						</form:SimpleForm>
+
+						<form:SimpleForm
+								title="4. Pricing"
+								editable="false"
+								layout="ResponsiveGridLayout">
+							<form:content>
+								<Label text="Price"/>
+								<Text id="ProductPriceChosen" text="{/productPrice}"/>
+								<Label text="Discount Group"/>
+								<Text id="DiscountGroupChosen" text="{/discountGroup}"/>
+								<Label text="VAT Included"/>
+								<Text id="ProductVATChosen" text="{/productVAT}"/>
+								<Link press="editStepFour" text="Edit" />
+							</form:content>
+						</form:SimpleForm>
+					</content>
+					<footer>
+						<Bar>
+							<contentRight>
+								<Button text="Submit" press="handleWizardSubmit"/>
+								<Button text="Cancel" press="handleWizardCancel"/>
+							</contentRight>
+						</Bar>
+					</footer>
+
+				</Page>
+
+			</pages>
+		</NavContainer>
 
 </mvc:View>
+
+    <!-- <Page title="Step 1 - Impiegato">
+        <content>
+            <VBox id="vboxView1">
+                <SearchField id="searchField" search=".onSearch" width="100%" placeholder="Inserisci nome e cognome" />
+                <Input  value="{path: '/SelectedEmployee/FirstName'}" editable="false" placeholder="usa matchcode" />
+                <Input  value="{path: '/SelectedEmployee/LastName'}" editable="false" />
+                <Input  value="{path: '/SelectedEmployee/HireDate', formatter: '.formatHireDate'}" editable="false" />
+                <Input  value="{path: '/SelectedEmployee/Title'}" editable="false" />
+            </VBox>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <Button text="Continua" press=".onContinue" />
+            </OverflowToolbar>
+        </footer> 
+    </Page> -->
