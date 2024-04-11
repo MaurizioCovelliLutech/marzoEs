@@ -1,42 +1,244 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.m" controllerName="sap.btp.apui5.controller.View1">
-    <VBox alignItems="Center">
-       <Label text="Nome" required="true"/> <Input id="Nome" /> 
-        <Label text="Cognome" required="true"> </Label> <Input id="Cognome" required="true" />
-        <Label text="Sesso" required="true"/> <Select id="Sesso">
-            <core:Item key="Maschio" text="Maschio" />
-            <core:Item key="Femmina" text="Femmina" />
-            <core:Item key="Altro" text="Altro" />
-        </Select>
-        <Label text="CF"/> <Input id="CF" maxLength="16" />
-        <Label text="Telefono"/> <Input id="Telefono" type="Number"/>
-        <Button text="Rivedi dati" press="onPress" />
-    </VBox>
+<mvc:View 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m" 
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified" 
+    controllerName="sap.btp.apui5.controller.View1">
 
-    <!--sotto sto facendo una tabella-->
+    <NavContainer id="wizardNavContainer" >
+			<pages>
+				<Page
+				id="wizardContentPage"
+				showHeader="false">
+					<content>
+						<Wizard id="CreateProductWizard"
+                        showNextButton="false" 
+                        class="sapUiResponsivePadding--header sapUiResponsivePadding--content"
+								complete="wizardCompletedHandler">
+							<!-- <WizardStep id="FirstNameStep"
+										title="Employee"
+										validated="true">
+								
+								<Text class="sapUiSmallMarginBottom"
+                                    text="prova"
+                                        />
+								<HBox
+										alignItems="Center"
+										justifyContent="Center"
+										width="100%">
+								</HBox>
+							</WizardStep> -->
+							<WizardStep id="Impiegato"
+										validated="false"
+										title="Impiegato"
+										activate="additionalInfoValidation">
+								<MessageStrip class="sapUiSmallMarginBottom"
+										text="sono un messaggio blu "
+										showIcon="true"/>
+								<Text text="  Donec pulvinar"/>
+								
+								<form:SimpleForm
+										editable="true"
+										layout="ResponsiveGridLayout">
+									<Label text="Name" required="true"/>
+									<Input valueStateText="nome>>"
+											valueState="{/firstNameState}" 
+											id="FirstName"
+											placeholder="inserisci nome"
+											showSuggestion="true"
+											autocomplete="true"
+											value="{/firstName}"
+											valueHelpRequest="onValueHelpRequested"
+											showValueHelp="true"
+											change="cercaEnter"
+											/>
+											
+											<Label text="Nome " />
+                       						<Text text="{modSelectedEmployee>/FirstName}" />
+											<Label text="Cognome " />
+                       						<Text text="{modSelectedEmployee>/LastName}"/>
+											<Label text="Data " />
+                        					<Text text="{path: 'modSelectedEmployee>/HireDate' , formatter:'.formatDate'}" />
+									
+									
+								</form:SimpleForm>
 
-     <Page>
-    <content>
-      <Button text="Avanti Tabella" press="navigate" />
-      <SearchField id="barraRicerca" search="onSearch" width="100%"/> 
-      <Table id="tabellaProva" items="{modelloUno>/}">
-        <columns>
-          <Column>
-            <Text text="Parametro" />
-          </Column>
-          <Column>
-            <Text text="Valore" />
-          </Column>
-        </columns>
-        <items> <!--aggregazione item-->
-          <ColumnListItem>
-            <cells>
-              <Label text="{modelloUno>Parametro}" />
-              <Input value="{modelloUno>Valore}" />
-            </cells>
-          </ColumnListItem>
-        </items>
-      </Table>
-    </content>
-  </Page>
+							</WizardStep>
+						    <WizardStep title="Prodotti">
+        						<VBox>
+         						   <Table id="productsTable" mode="MultiSelect" items="{modProducts>/}">
+             							<columns>
+                				    		<Column>
+                       							 <Text text="Nome Prodotto" />
+                    						</Column>
+                   							<Column>
+                    						    <Text text="Prezzo unitario" />
+                   							</Column>
+											<Column>
+                       							<Text text="Unità rimaste" />
+                    						</Column>
+                   							<Column>
+                     							<Text text="Quantità" />
+                  							</Column>
+                   							<Column>
+                    						    <Text text="Prezzo totale" />
+                   							</Column>
+               							</columns>
+               						<items>
+                    					<ColumnListItem>
+                      						<cells>
+                           						<ObjectIdentifier title="{modProducts>ProductName}" />
+                            					<Text text="{modProducts>UnitPrice}" />
+                           						<Text text="{modProducts>UnitsInStock}" />
+                           						<StepInput id="stepInput" value="{modProducts>Quantity}" min="0" max="{modProduct>UnitsInStock}" change=".calculateTotalPrice" />
+                           						<Text text="{prezzoTotale}" />
+                       						</cells>
+                    					</ColumnListItem>
+                					</items>
+          						</Table>
+       						</VBox>
+					</WizardStep>							
+	
+<WizardStep id="PricingStep"
+title="Cliente">
+        <VBox>
+            <Table id="customersTable" mode="SingleSelect" items="{customersModel>/}">
+                <columns>
+                    <Column>
+                        <Text text="ID Cliente" />
+                    </Column>
+                    <Column>
+                        <Text text="Nome Compagnia" />
+                    </Column>
+                    <Column>
+                        <Text text="Nome Contatto" />
+                    </Column>
+                    <Column>
+                        <Text text="Località" />
+                    </Column>
+                    <Column>
+                        <Text text="Telefono" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier title="{customersModel>CustomerID}" />                            
+                            <Text text="{customersModel>CompanyName}" />
+                            <Text text="{customersModel>ContactName}" />
+                            <Text text="{= ${customersModel>City} + ' (' + ${customersModel>Country} + ')' }" />
+                            <Text text="{customersModel>Phone}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </VBox>
+    </WizardStep>
+        <WizardStep id="Riepilogo" title="Riepilogo">
+        <VBox class="sapUiSmallMargin">
+            <Panel class="sapUiTinyMarginBottom">
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Gruppo Impiegato" level="H2"/>
+                    </Toolbar>
+                </headerToolbar>
+                <VBox>
+                    <Text text="Nome: {modSelectedEmployee>/FirstName}"/>
+                    <Text text="Cognome: {modSelectedEmployee>/LastName}"/>
+                    <Text text="Data assunzione: {path: 'modSelectedEmployee>/HireDate' , formatter:'.formatDate'}"/>
+                    <Text text="Titolo: {modSelectedEmployee>/Title}"/>
+                </VBox>
+            </Panel>
+
+            <Panel class="sapUiTinyMarginBottom">
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Gruppo Prodotti" level="H2"/>
+                    </Toolbar>
+                </headerToolbar>
+                <Table id="tblProducts" items="{/Products}">
+                    <columns>
+                        <Column>
+                            <Text text="Nome Prodotto"/>
+                        </Column>
+                        <Column>
+                            <Text text="Prezzo unitario"/>
+                        </Column>
+                        <Column>
+                            <Text text="Unità in deposito"/>
+                        </Column>
+                        <Column>
+                            <Text text="Quantità"/>
+                        </Column>
+                        <Column>
+                            <Text text="Prezzo totale"/>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{ProductName}"/>
+                                <Text text="{UnitPrice}"/>
+                                <Text text="{UnitsInStock}"/>
+                                <Text text="{Quantity}"/>
+                                <Text text="{TotalPrice}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+                <Toolbar>
+                    <Title text="Prezzo totale esclusa spedizione: {/TotalPrice}"/>
+                </Toolbar>
+            </Panel>
+
+            <Panel>
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Gruppo Cliente" level="H2"/>
+                    </Toolbar>
+                </headerToolbar>
+                <VBox>
+                    <Text text="ID Cliente: ${/selectedCustomer/CustomerID}"/>
+                    <Text text="Nome Compagnia: {/selectedCustomer/CompanyName}"/>
+                    <Text text="Nome Contatto: {/selectedCustomer/ContactName}"/>
+                    <Text text="Località: {/selectedCustomer/City} ({/selectedCustomer/Country})"/>
+                    <Text text="Telefono: {/selectedCustomer/Phone}"/>
+                </VBox>
+            </Panel>
+        </VBox>
+    </WizardStep>
+
+						</Wizard>
+					</content>
+					<footer>
+						<OverflowToolbar>
+							<ToolbarSpacer/>
+                            <Button text="Continua" press="onContinue"/>
+							<Button text="Cancel" press="precedenteStep"/>
+							<Button text="chiamataEmployee" press="onSearch"/>
+
+						</OverflowToolbar>
+					</footer>
+				</Page>
+			</pages>
+		</NavContainer>
 
 </mvc:View>
+
+    <!-- <Page title="Step 1 - Impiegato">
+        <content>
+            <VBox id="vboxView1">
+                <SearchField id="searchField" search=".onSearch" width="100%" placeholder="Inserisci nome e cognome" />
+                <Input  value="{path: '/SelectedEmployee/FirstName'}" editable="false" placeholder="usa matchcode" />
+                <Input  value="{path: '/SelectedEmployee/LastName'}" editable="false" />
+                <Input  value="{path: '/SelectedEmployee/HireDate', formatter: '.formatHireDate'}" editable="false" />
+                <Input  value="{path: '/SelectedEmployee/Title'}" editable="false" />
+            </VBox>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <Button text="Continua" press=".onContinue" />
+            </OverflowToolbar>
+        </footer> 
+    </Page> -->

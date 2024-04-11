@@ -44,7 +44,7 @@
         }
     },
     "sap.ui5": {
-        "flexEnabled": true,
+        "flexEnabled": false,
         "dependencies": {
             "minUI5Version": "1.121.1",
             "libs": {
@@ -102,7 +102,7 @@
                 },
                 {
                     "name": "Gianfra",
-                    "pattern": "View2/{nome},{cognome},{sesso},{codiceFiscale},{numeroTelefono}",
+                    "pattern": ":?query:",
                     "target": [
                         "TargetView2"
                     ]

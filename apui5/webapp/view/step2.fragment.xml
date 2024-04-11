@@ -1,0 +1,48 @@
+<mvc:View 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m" 
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified" 
+    controllerName="sap.btp.apui5.controller.View1">
+        <Page title="Step 2 - Prodotti">
+        <content>
+            <Table id="productsTable" mode="MultiSelect" items="{/Products}">
+                <columns>
+                    <Column>
+                        <Text text="Nome Prodotto" />
+                    </Column>
+                    <Column>
+                        <Text text="Prezzo unitario" />
+                    </Column>
+                    <Column>
+                        <Text text="Unità rimaste" />
+                    </Column>
+                    <Column>
+                        <Text text="Quantità" />
+                    </Column>
+                    <Column>
+                        <Text text="Prezzo totale" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <!-- <ObjectIdentifier title="{ProductName}" /> -->
+                            <Text text="{=parseFloat(${UnitPrice})}" />
+                            <Text text="{UnitsInStock}" />
+                            <StepInput value="{Quantity}" min="0" max="{UnitsInStock}" change="" />
+                            <Text text="{TotalPrice}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button text="Continua" press="prossimoStep" />
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>
