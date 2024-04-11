@@ -19,6 +19,10 @@ sap.ui.define([
     return Controller.extend("sap.btp.apui5.controller.View1", {
 
         onInit: function () {
+
+			const oRouter = this.getOwnerComponent().getRouter();
+            oRouter.getRoute("RouteView1").attachPatternMatched(this.onRouteMatched, this);
+
 			this._wizard = this.byId("CreateProductWizard");
 			this._oNavContainer = this.byId("wizardNavContainer");
 			this._oWizardContentPage = this.byId("wizardContentPage");
@@ -36,9 +40,10 @@ sap.ui.define([
 
 			var oModel = new ODataModel("/V2/Northwind/Northwind.svc/");
 
-		  
+		  //aggiungere filtro per non ptendere i valori con unitarimaste inferiori a 1
 			const oData = await new Promise((resolve, reject) => {
 				oModel.read("/Products" , {
+					filters: [new sap.ui.model.Filter("UnitsInStock", sap.ui.model.FilterOperator.GT, '0')],
 					success: function(oData, response) {
 						resolve(oData);
 					  },
@@ -46,11 +51,50 @@ sap.ui.define([
 						  reject(error);
 					  }
 				  });
+			  });
+			
+			  this.getView().setModel(new JSONModel(oData.results), "modProducts");
+
+			  
+			  //__________________________________________________________________
+			  var oModel2 = new ODataModel("/V2/Northwind/Northwind.svc/");
+
+			const oData2 = await new Promise((resolve, reject) => {
+				oModel2.read("/Customers" , {
+					success: function(oData2, response) {
+						resolve(oData2);
+					  },
+					  error: function(error) {
+						  reject(error);
+					  }
+				  });
 			  });	  
 
-			  this.getView().setModel(new JSONModel(oData.results), "modProducts");
-  
+			  this.getView().setModel(new JSONModel(oData2.results), "customersModel");
+
+
+			  //this.chiamataCliente(); //cosi faccio anche la chiamata a customers per lo step 3
 		},
+
+		// chiamataCliente: async function(oEvent){
+		// 	var oModel = new ODataModel("/V2/Northwind/Northwind.svc/");
+
+		  
+		// 	const oData = await new Promise((resolve, reject) => {
+		// 		oModel.read("/Customers" , {
+		// 			success: function(oData, response) {
+		// 				resolve(oData);
+		// 			  },
+		// 			  error: function(error) {
+		// 				  reject(error);
+		// 			  }
+		// 		  });
+		// 	  });	  
+
+		// 	  var oTable = this.getView().byId("customerTable");
+		// 	  //oBinding.filter(aFilters);
+		// 	  this.getView().setModel(new JSONModel(oData.results), "customersModel");
+		// },
 
 
 		onSearch: async function (oEvent) {
@@ -295,19 +339,103 @@ sap.ui.define([
 			this._wizard.previousStep();
 		},
 		
-		calculateTotalPrice: function(event) {
+		// calculateTotalPrice: function(event) {
 			
-			var oItem = event.getSource().getParent();
-            var prezzoUnita = parseFloat(oItem.getBindingContext().getProperty("UnitPrice"));
-            var quantita = parseInt(oItem.getBindingContext().getProperty("Quantity"));
-            var prezzoTotale = prezzoUnita * quantita;
-            oItem.getBindingContext("modProducts").setProperty("TotalPrice", prezzoTotale.toFixed(2));
-			
-        },
-		
-	});
-});
+		// 	var oItem = event.getSource().getParent();
+        //     var prezzoUnita = parseFloat(oItem.getBindingContext().getProperty("UnitPrice"));
+        //     var quantita = parseInt(oItem.getBindingContext().getProperty("Quantity")); //leggere direttamente lo stepinput invece di getbindingcontext
+        //     var prezzoTotale = prezzoUnita * quantita;
+        // 	oItem.getBindingContext().setProperty("TotalPrice", prezzoTotale.toFixed(2)); //dal getbindingcontext non posso faree cirettament set property
 
+			
+        // },
+
+		calculateTotalPrice: function(oEvent) {
+			var oInput = oEvent.getSource().getParent();
+			var prezzoUnita = parseFloat(oInput.getBindingContext().getProperty("UnitPrice"));
+			var quantita = oEvent.getParameter("value");
+			var prezzoTotale = prezzoUnita * quantita;
+		
+			var oModel = oInput.getModel();
+		
+			var sPath = oInput.getBindingContext().getPath();
+
+			this.getView().setModel(new JSONModel("prezzoTotale"), "modPrezzoTotale");
+
+			oModel.setProperty(sPath + "TotalPrice", prezzoTotale.toFixed(2));
+		},
+		
+
+		
+		cercaEnter: async function(oEvent){
+			var sValue = oEvent.getParameter("query");
+
+    		if (!sValue) {
+   		    	MessageToast.show("Inserisci un nome valido");
+        		return;
+    }
+
+    		var oFilter = new sap.ui.model.Filter("FirstName", sap.ui.model.FilterOperator.Contains, sValue);
+    		var aFilters = [];
+
+			aFilters.push(oFilter);
+
+    		var oModel = new ODataModel("/V2/Northwind/Northwind.svc/");
+
+    
+        	const oData = await new Promise((resolve, reject) => {
+            	oModel.read("/Employees", {
+                	filters: aFilters,
+                	success: function(oData, response) {
+                    	resolve(oData);
+                	},
+                	error: function(error) {
+                   	reject(error);
+                	}
+            	});
+        	});
+
+        	if (oData.results && oData.results.length > 0) {
+
+            	this.getView().setModel(new JSONModel(oData.results[0]), "modSelectedEmployee");
+        	} else {
+            	sap.m.MessageToast.show(" No corrispondenze >:( ");
+
+           	// this.getView().setModel(new JSONModel(), "modSelectedEmployee");
+        	}
+			},
+
+			formatDate: function(date){
+				var oDateFormat = sap.ui.core.format.DateFormat.getDateTimeInstance({pattern:"dd-MM-yyyy"});
+				return oDateFormat.format(date);
+			},
+			
+		});
+	});
+	
+	//  cercaEnter: async function(oEvent){
+	// 	var sValue = oEvent.getParameter("query");
+	//     var oFilter = new sap.ui.model.Filter("FirstName", sap.ui.model.FilterOperator.Contains, sValue);
+	//     var aFilters = [];
+		
+	//     aFilters.push(oFilter);
+	
+	//     var oModel = new ODataModel("/V2/Northwind/Northwind.svc/");
+	//     const oData = await new Promise((resolve, reject) => {
+	//         oModel.read("/Employees", {
+	//             filters: [oFilter],
+	//             success: function(oData, response) {
+	//                 resolve(oData);
+	//             },
+	//             error: function(error) {
+	//                 reject(error);
+	//             }
+	//         });
+	//     });
+	
+	//     //var oTable = this.byId("");
+	//    this.getView().setModel(new JSONModel(oData.results), "modSelectedemployee");
+	//  }
 //_______________ATTENZIONE______________________DA QUI PARTE LA QUARANTENA COMMENTI______________________ATTENZIONE________________
 
 
